@@ -7,9 +7,10 @@ import openai
 from .azure_tts import Speech
 from .config import DevConfig
 from .utils import CircularConversation, contains_delimiter
-
-openai.api_key = 'sb-7ecc3c07ddb792181f53eff3b7b425f9'
-openai.api_base = "https://api.openai-sb.com/v1"
+#openai_api_key = 'sb-7ecc3c07ddb792181f53eff3b7b425f9'
+#openai_api_base = "https://api.openai-sb.com/v1"
+openai.api_key = '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'
+openai.api_base = "https://proxy.994938.xyz/v1"
 # one conversation = 1 ask + 1 reply
 PREVIOUS_CONVERSATIONS = CircularConversation(DevConfig.PREVIOUS_MESSAGES_COUNT + 1)
 
