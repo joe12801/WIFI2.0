@@ -31,7 +31,7 @@ class BaseSpeech:
                 break
             if expected_idx != idx:
                 # 下标不对，放回
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(0.5)
                 await self.audio_queue.put((idx, audio_data))
                 continue
             try:
