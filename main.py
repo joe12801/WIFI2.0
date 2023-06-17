@@ -15,10 +15,11 @@ import pyaudio
 os.environ["SERPER_API_KEY"] = "4a2048e888cada7ca58c19bbbf98e663915e03b2cfef849509a1e5f64a53032e"
 PICOVOICE_API_KEY = "iMeqNtcbskHeSMRXxSNC5zWRmyet+UsDvDeWh/2xby3jyVK6hZZraA=="
 keyword_path = './speechmodules/hi-moss_en_windows_v2_1_0.ppn'
-APP_ID = '23628677'
-API_KEY = 'CL1A8SbwCGVdfU6dZ7FA84Hj'
-SECRET_KEY = 'qZYSUyqq429FxA4hHPaZELSUwxPK7BNi'
+APP_ID = '34393247'
+API_KEY = 'N2r58mtACS2PDG2FXBngBQeY'
+SECRET_KEY = '112Y2GI5goSS0nN2D8cYkfm0dYwHCxMO'
 voice = "zh-CN-XiaoyiNeural"
+
 
 import speech_recognition as sr
 
