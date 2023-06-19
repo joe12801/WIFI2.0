@@ -1,7 +1,11 @@
+import requests
 from aip import AipSpeech
 import speech_recognition as sr
-import paho.mqtt.client as mqtt
-
+import openai
+# pip install azure-cognitiveservices-speech
+import azure.cognitiveservices.speech as speechsdk
+import time
+import uuid
 
 class BaiduASR:
     def __init__(self, APP_ID, API_KEY, SECRET_KEY):
@@ -52,17 +56,157 @@ class BaiduASR:
             return "语音识别失败：" + result["err_msg"]
         else:
             return result['result'][0]
-    def send_mqtt(self, message):
-        client = mqtt.Client()
-        client.username_pw_set("jsfer888", "wuguibing888")
-        client.connect("1307.wgb888.xyz", 1883, 60)
-        client.publish("speech2text", message)
-        client.disconnect()
+
+
+class OpenaiASR:
+    def __init__(self, API_KEY):
+        self.API_KEY = API_KEY
+        self.r = sr.Recognizer()
+
+    # 从麦克风收集音频并写入文件
+    def _record(self, if_cmu: bool = False, rate=16000):
+        with sr.Microphone(sample_rate=rate) as source:
+            print('您可以开始说话了')
+            audio = self.r.listen(source, timeout=20, phrase_time_limit=5)
+
+        file_name = "./speech.wav"
+        with open(file_name, "wb") as f:
+            f.write(audio.get_wav_data())
+
+        if if_cmu:
+            return audio
+        else:
+            return self._get_file_content(file_name)
+
+    # 从本地文件中加载音频 作为后续百度语音服务的输入
+    def _get_file_content(self, file_name):
+        with open(file_name, 'rb') as f:
+            audio_data = f.read()
+        return audio_data
+
+    def _get_speech_text(self, audio_file):
+        print('调用用语音识别')
+        url = 'https://proxy.994938.xyz/v1/audio/transcriptions'
+        headers = {
+            'Authorization': 'Bearer ' + self.API_KEY
+        }
+        files = {
+            'file': ('./speech.wav', audio_file),
+        }
+        data = {
+            'model': 'whisper-1',
+        }
+        response = requests.post(url, headers=headers, data=data, files=files)
+        result = response.json()['text']
+        # print(result)
+        return result
+
+    def speech_to_text(self, audio_path: str = "test.wav", if_microphone: bool = True):
+        if if_microphone:
+            result = self._get_speech_text(self._record())
+        else:
+            result = self._get_speech_text(audio_path)
+        return result
+
+
+class AzureASR:
+    def __init__(self, AZURE_API_KEY, AZURE_REGION):
+        self.AZURE_API_KEY = AZURE_API_KEY
+        self.AZURE_REGION = AZURE_REGION
+        self.speech_config = speechsdk.SpeechConfig(subscription=AZURE_API_KEY, region=AZURE_REGION)
+
+    def speech_to_text(self, audio_path: str = "test.wav", if_microphone: bool = True):
+        self.speech_config.speech_recognition_language = "zh-CN"
+        audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
+        speech_recognizer = speechsdk.SpeechRecognizer(speech_config=self.speech_config, audio_config=audio_config)
+        print("Speak into your microphone.")
+        speech_recognition_result = speech_recognizer.recognize_once_async().get()
+
+        if speech_recognition_result.reason == speechsdk.ResultReason.RecognizedSpeech:
+            print("Recognized:{}".format(speech_recognition_result.text))
+            return speech_recognition_result.text
+        elif speech_recognition_result.reason == speechsdk.ResultReason.NoMatch:
+            print("No speech could be recognized :{}".format(speech_recognition_result.no_match_details))
+        elif speech_recognition_result.reason == speechsdk.ResultReason.Canceled:
+            cancellation_details = speech_recognition_result.cancellation_details
+            print("Speech Recognition canceled:{}".format(cancellation_details.reason))
+            if cancellation_details.reason == speechsdk.CancellationReason.Error:
+                print("Error details:{}".format(cancellation_details.error_details))
+                print("Did you set the speech resource key and region values?")
+        return None
+
+class WhisperASR:
+    def __init__(self, API_KEY):
+        self.API_KEY = API_KEY
+        self.r = sr.Recognizer()
+
+    # 从麦克风收集音频并写入文件
+    def _record(self, if_cmu: bool = False, rate=16000):
+        with sr.Microphone(sample_rate=rate) as source:
+            print('您可以开始说话了')
+            audio = self.r.listen(source, timeout=20, phrase_time_limit=5)
+
+        file_name = "./speech.wav"
+        with open(file_name, "wb") as f:
+            f.write(audio.get_wav_data())
+
+        if if_cmu:
+            return audio
+        else:
+            return self._get_file_content(file_name)
+
+    # 从本地文件中加载音频 作为后续百度语音服务的输入
+    def _get_file_content(self, file_name):
+        with open(file_name, 'rb') as f:
+            audio_data = f.read()
+        return audio_data
+
+    def _get_speech_text(self, file_path):
+        print('调用用语音识别')
+        url = 'http://whisper.994938.xyz/asr'
+        params = {
+            'task': 'transcribe',
+            'language': 'zh',
+            'encode': 'true'
+   
+        }
+
+        files = {
+            'audio_file': ('./speech.wav', file_path, 'audio/mpeg'),
+        }
+        #files = {'audio_file': (file_path, open('./speech.wav', 'rb'), 'audio/mpeg')}
+
+        headers = {'accept': 'text/plain'}
+
+        response = requests.post(url, params=params, files=files, headers=headers)
+
+        return response.text
+
+
+
+
+   
+
+    def speech_to_text(self, audio_path: str = "test.wav", if_microphone: bool = True):
+        if if_microphone:
+            result = self._get_speech_text(self._record())
+        else:
+            result = self._get_speech_text(audio_path)
+        return result
 
 if __name__ == '__main__':
-    APP_ID = '23628677'
-    API_KEY = 'CL1A8SbwCGVdfU6dZ7FA84Hj'
-    SECRET_KEY = 'qZYSUyqq429FxA4hHPaZELSUwxPK7BNi'
-    baiduasr = BaiduASR(APP_ID, API_KEY, SECRET_KEY)
-    result = baiduasr.speech_to_text()
-    print(result)
+    # APP_ID = ''
+    # API_KEY = ''
+    # SECRET_KEY = ''
+    # baiduasr = BaiduASR(APP_ID, API_KEY, SECRET_KEY)
+    # result = baiduasr.speech_to_text()
+    # print(result)
+    # AZURE_API_KEY = ""
+    # AZURE_REGION = ""
+    # azureasr = AzureASR(AZURE_API_KEY, AZURE_REGION)
+    # azureasr.speech_to_text()
+    openai_api_key = "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"
+    openaiasr = WhisperASR(openai_api_key)
+    print(openaiasr.speech_to_text())
+   
+    
