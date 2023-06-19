@@ -48,7 +48,7 @@ async def build_sentence_from_stream(async_stream) -> str:
 
         reply_finished = choice["finish_reason"] == "stop"
 
-        is_complete_sentence = contains_delimiter(content) and len(words) > 10
+        is_complete_sentence = contains_delimiter(content) and len(words) > 2
 
         if is_complete_sentence or reply_finished:
             reply.append(words_to_speek(speech, idx, words[:]))
