@@ -28,8 +28,8 @@ class Speech:
             if msg["type"] == "audio" and (data := msg["data"]):
                 audio_bytes.append(data)
         await stream.aclose()
-        if len(audio_bytes) > 10:
-            audio_bytes = audio_bytes[1:-5]
+        if len(audio_bytes) > 2:
+            audio_bytes = audio_bytes[1:-2]
         await self.audio_queue.put((idx, b"".join(audio_bytes)))
 
     def get_stream(self, text):
