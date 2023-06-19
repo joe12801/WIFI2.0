@@ -4,7 +4,7 @@ from playsound import playsound
 from chatmodules.openai_chat_module import OpenaiChatModule
 from chatmodules.chatgpt import ask
 from speechmodules.wakeword import PicoWakeWord
-from speechmodules.speech2text import BaiduASR
+from speechmodules.speech2text import BaiduASR,OpenaiASR,WhisperASR
 from speechmodules.text2speech import EdgeTTS
 from playsound import playsound
 import struct
@@ -13,8 +13,9 @@ import os
 import pyaudio
 # 参数填写
 os.environ["SERPER_API_KEY"] = "4a2048e888cada7ca58c19bbbf98e663915e03b2cfef849509a1e5f64a53032e"
-PICOVOICE_API_KEY = "iMeqNtcbskHeSMRXxSNC5zWRmyet+UsDvDeWh/2xby3jyVK6hZZraA=="
-keyword_path = './speechmodules/hi-moss_en_windows_v2_1_0.ppn'
+PICOVOICE_API_KEY = "LT2uDH/ykIzbQllV10WY7qIAe4vMARGfJgEMODGFKeq7mH91nyuNjw=="
+openai_api_key = "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" 
+keyword_path = './speechmodules/hi-lucy_en_windows_v2_2_0.ppn'
 APP_ID = '34393247'
 API_KEY = 'N2r58mtACS2PDG2FXBngBQeY'
 SECRET_KEY = '112Y2GI5goSS0nN2D8cYkfm0dYwHCxMO'
@@ -36,7 +37,7 @@ def run(picowakeword, asr):
         if keyword_idx >= 0:
             picowakeword.porcupine.delete()
             picowakeword.stream.close()
-            picowakeword.myaudio.terminate()  # 需要对取消对麦克风的占用!
+            #picowakeword.myaudio.terminate()  # 需要对取消对麦克风的占用!
 
             print("嗯,我在,请讲！")
             playsound("./wozai.mp3")
@@ -51,7 +52,8 @@ def run(picowakeword, asr):
 
 def Orator():
     picowakeword = PicoWakeWord(PICOVOICE_API_KEY, keyword_path)
-    asr = BaiduASR(APP_ID, API_KEY, SECRET_KEY)
+    #asr = BaiduASR(APP_ID, API_KEY, SECRET_KEY)
+    asr = OpenaiASR(openai_api_key)
     tts = EdgeTTS()
     try:
         run(picowakeword, asr)
