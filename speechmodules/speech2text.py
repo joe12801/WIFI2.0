@@ -24,7 +24,7 @@ class BaiduASR:
             print('您可以开始说话了')
             # timeout 用于指定等待语音输入的最长时间（秒），如果没有检测到语音输入，则函数将返回None。默认值为 None，表示等待无限长的时间。如果指定了超时时间，则函数将在等待指定时间后自动返回。
             # phrase_time_limit：用于指定允许单次语音输入的最长时间（秒），如果超过这个时间，函数将自动停止录制，并返回None.默认值为 None，表示允许单次语音输入的时间没有限制。
-            audio = self.r.listen(source, timeout=20, phrase_time_limit=4)
+            audio = self.r.listen(source, timeout=20, phrase_time_limit=3)
 
         file_name = "./speech.wav"
         with open(file_name, "wb") as f:
