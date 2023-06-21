@@ -53,7 +53,7 @@ def run(picowakeword, asr):
 def Orator():
     picowakeword = PicoWakeWord(PICOVOICE_API_KEY, keyword_path)
     #asr = BaiduASR(APP_ID, API_KEY, SECRET_KEY)
-    asr = OpenaiASR(openai_api_key)
+    asr = WhisperASR(openai_api_key)
     tts = EdgeTTS()
     try:
         run(picowakeword, asr)
