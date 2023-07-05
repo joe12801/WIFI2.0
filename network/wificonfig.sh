@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH_TO_PYTHON_FILE="/home/user/wifi/main.py"
+PATH_TO_PYTHON_FILE="/home/user/WIFI2.0/network/wifi/main.py"
 PORT_TO_CHECK=8080
 
 CHECK_INTERVAL=60  # 延时检查的时间间隔，单位为秒
