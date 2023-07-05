@@ -22,9 +22,25 @@ check_network_connection() {
     fi
 }
 
+check_internet_connection() {
+    ping -c 1 baidu.com > /dev/null 2>&1
+
+    if [ $? -eq 0 ]; then
+        connected=true
+        echo "Turning on green internet LED..."
+        echo "default-on" > /sys/class/leds/green:internet/trigger    
+        echo "已联网"
+    else
+        connected=false
+        echo "Turning off green internet LED..."
+        echo "none" > /sys/class/leds/green:internet/trigger
+    fi
+}
+
 #while true; do
-    check_network_connection
-    
+    check_internet_connection
+    sleep 1
+    check_internet_connection
     if [[ "$connected" == false ]]; then
         port_in_use=$(lsof -i :$PORT_TO_CHECK)
         if [[ -n "$port_in_use" ]]; then
@@ -38,7 +54,7 @@ check_network_connection() {
         fi
         
         echo "Connecting to Wi-Fi hotspot..."
-        nmcli d wifi hotspot ifname wlan0 ssid 4G-WIFI-blue password 12345678
+        nmcli d wifi hotspot ifname wlan0 ssid 4G-WIFI-gree password 12345678
         sleep $DELAY
         python3 "${PATH_TO_PYTHON_FILE}"
     else
